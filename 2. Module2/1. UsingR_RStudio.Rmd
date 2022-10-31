@@ -1,0 +1,384 @@
+---
+title: "Using R and RStudio: Basic Engagement"
+author: "Ashley I Naimi"
+date: "Oct 2022"
+urlcolor: blue
+bibliography: ref.bib
+link-citations: yes
+output: 
+    bookdown::pdf_book:
+      base_format: tint::tintPdf
+      toc: true
+      number_sections: true
+      includes:
+        in_header: "../misc/preamble.tex"
+      latex_engine: xelatex
+    html_document:
+      theme: readable
+      toc: true
+      toc_float: true
+      number_sections: true
+      css: "../misc/style.css"
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=40),tidy=TRUE)
+
+packages <- c( "data.table","tidyverse","ggplot2","ggExtra","formatR",
+               "gridExtra","skimr","here","Hmisc","RColorBrewer")#,"gmm")
+
+for (package in packages) {
+  if (!require(package, character.only=T, quietly=T)) {
+    install.packages(package, repos='http://lib.stat.cmu.edu/R/CRAN',dependencies=T)
+  }
+}
+
+for (package in packages) {
+  library(package, character.only=T)
+}
+
+remotes::install_github("rstudio/fontawesome")
+
+library(fontawesome)
+
+thm <- theme_classic() +
+  theme(
+    legend.position = "top",
+    legend.background = element_rect(fill = "transparent", colour = NA),
+    legend.key = element_rect(fill = "transparent", colour = NA)
+  )
+theme_set(thm)
+```
+
+\newpage
+\onehalfspacing
+
+\newpage
+\onehalfspacing
+
+# Basic Engagement with R
+
+## Running Code in R
+
+To run a line of code in the R programming language, place your cursor at the end of a line, and press:
+
+- COMMAND + RETURN (Mac)
+- CTRL + ENTER (Windows)
+
+```{r}
+2*2*2
+```
+
+Alternatively, highlight a single or multiple lines with your cursor, and press the same keys
+
+## R as a calculator
+
+Most basically, R is a very advanced calculator:
+
+```{r eval=T,warning=F,results='hide'}
+2 + 2 # add numbers
+2 * pi # multiply by a constant
+3^4 # powers
+runif(5) # random number generation
+sqrt(4^2) # functions
+log(10) # natural log (i.e., base e)
+log(100, base = 10) # log base 10
+23 %/% 2 # integer division
+23 %% 2 # modulus operator
+
+# scientific notation
+5000000000 * 1000
+5e9 * 1e3
+```
+
+More operators can be found here: [Quick-R](https://www.statmethods.net/management/operators.html)
+
+## Assigning values to R objects 
+
+R is "object oriented". A basic task in R is to assign values to objects and perform functions on them:
+
+```{r}
+
+a <- 10
+a 
+a/100
+a+10
+
+# R is case sensitive!!!
+A <- 15
+print(c(a,A))
+```
+
+The left arrow assignment operator is the most common one used, but there are other ways to do it as well^[(https://www.roelpeters.be/the-difference-between-arrow-and-equals-assignment-in-r/)[https://www.roelpeters.be/the-difference-between-arrow-and-equals-assignment-in-r/]]:
+
+```{r}
+
+`<-`(x, 3)  # Prefix notation 
+x <- 3      # Leftwards assignment
+3 -> x      # Rightwards assignment
+x = 3       # Equal sign
+
+```
+
+## Vectors
+
+```{r}
+## Basic functional unit in R is a vector:
+# numeric vector
+nums <- c(1.1, 3, -5.7)
+nums
+
+nums <- rep(nums,2)
+nums
+
+# integer vector
+ints <- c(1L, 5L, -3L) # force storage as integer not decimal number
+# 'L' is for 'long integer' (historical)
+
+# sample nums with replacement
+new_nums <- sample(nums,8,replace = TRUE)
+new_nums
+
+# logical (i.e., Boolean) vector
+bools <- c(TRUE, FALSE, TRUE, FALSE, T, T, F, F)
+bools
+# character vector
+chars <- c("epidemiology is", "the study", 
+           "of the", "distribution", 
+           "and determinants", "of disease", 
+           "in", "a population")
+chars
+```
+
+## Data Frames
+Vectors can be combined into data frames (the basic data unit in R):
+```{r}
+A <- data.frame(new_nums,bools,chars)
+A
+```
+
+## Lists
+And pretty much anything (vectors, data frames) can be combined into lists:
+```{r}
+basic_list <- list(rep(1:3,5),
+                   "what do you think of R so far?",
+                   A)
+basic_list[[1]]
+basic_list[[2]]
+head(basic_list[[3]])
+```
+
+## Subsetting
+```{r}
+
+vals <- seq(2, 12, by = 2)
+vals
+
+vals[3]
+vals[3:5]
+vals[c(1, 3, 6)]
+vals[-c(1, 3, 6)]
+vals[c(rep(TRUE, 3), rep(FALSE, 2), TRUE)]
+
+```
+
+## Subsetting Data Frames
+
+```{r error=T}
+
+A[3,];A[,3]
+A[2:3,];A[,2:3]
+subset(A,bools==F,select = -bools)
+
+```
+
+## R Functions: Getting Help
+
+```{r}
+# HELP!
+?median
+
+help.search('linear regression')
+
+help(package='ggplot2')
+```
+
+## (Base) R Functions: Object Structure
+
+`iris` is a flower dataset included with R. The `str()` command gives the structure of the iris dataset:
+```{r}
+str(iris)
+```
+
+The `class()` command tells us what kind of object this is:
+```{r}
+class(iris)
+```
+
+# R Packages
+
+R remains cutting edge through a network of users/maintainers who contribute **packages**. 
+Packages are functions that are not part of base R.
+Without these packages, R would be much less useful.
+
+For example:
+
+ - `VIM` is a package for the VIsualisation of Missing data
+
+ - `boot` is a package to get bootstrap CIs and standard errors
+ 
+ - `splines` is a package for including flexible regression splines in linear models
+ 
+ - `data.table` is a package for fast manipulation of data frames
+
+ - The `tidyverse` is a collection of packages that facilitate the practice of "tidy" data science.
+ 
+:::{.rmdnote data-latex="{tip}"}
+
+__CRAN Packages and Development Packages__:
+
+|               The reason that R is such a useful tool for statistical analysis is that there is a large community of users and developers who contribute **packages** that can be deployed in R. Packages are tools that enable the wider community to implement statistical methods. For example, if you were interested in using quantile regression, you would install and load the `quantreg` package. If you wanted to use generalized additive models, you could install and load the `mgcv` package. For anything related to survival analysis, you would install and load the `survival` package, and so on. 
+
+Generally, there are two places where packages are stored. The first is CRAN. To install packages from CRAN, you would simply use the code presented below (i.e., `install.packages()`). However, there are countless packages that are not on CRAN, and are considered **development** packages. These packages can be hosted anywhere, but are usually found on GitHub. There are ways to install packages from GitHub directly into R. For example, using the `install_github()` function in the `remotes` package (which can be installed from CRAN).
+
+:::
+
+## Installing and loading packages
+
+Let's install the tidyverse, and some other packages that are important for basic data visualization. 
+
+If this is your first time installing packages in R, you'll have to choose a CRAN mirror. This is done with the "repos = " (repository) argument (but can be done other ways too).
+
+```{r,warning=F,message=F}
+install.packages("tidyverse",repos='http://lib.stat.cmu.edu/R/CRAN')
+library(tidyverse)
+```
+
+You should get a warning and other messages that I excluded here.
+
+Let's also install and load a package for the VIsualisation of Missing data:
+
+```{r,warning=F,message=F}
+ install.packages("VIM",repos='http://lib.stat.cmu.edu/R/CRAN')
+ library(VIM)
+```
+
+For some projects, you will need to install and load several packages, and it may not be good practice to keep repeating the `install.packages` and `library` commands for every single package needed.^[There is a principle in data science we refer to as DRY: Don't Repeat Yourself. When you find yourself copying and pasting code over an over again, there is usually a better solution (and that solution usually comes in the form of a loop or function).] Instead of writing these functions over and over again, we can create a for loop that installs and loads the packages we need. For example:
+
+```{r}
+
+packages <- c("data.table","tidyverse","here")
+
+for (package in packages) {
+  if (!require(package, character.only=T, quietly=T)) {
+    install.packages(package, repos='http://lib.stat.cmu.edu/R/CRAN')
+  }
+}
+
+for (package in packages) {
+  library(package, character.only=T)
+}
+
+```
+
+
+## Importing data into R
+
+We can now use functions from the `tidyverse` and the `here` packages^[We will learn a lot more about `here` in a subsequent section.] to load our NHEFS data:
+
+```{r}
+library(here)
+nhefs <- read_csv(here("data","nhefs.csv"))
+```
+
+We can also import data directly from online:
+
+```{r}
+nhefs <- read_csv(url("https://tinyurl.com/2s432xv6"))
+```
+
+Using the `tidyverse` package (in this case, the `read_csv` function) to import data (as opposed to base R options, such as `read.csv`) creates a tibble, which is an augmented data frame.
+
+```{r}
+class(nhefs)
+```
+
+More options for importing data: [R Studio Data Import Cheat Sheet](https://raw.githubusercontent.com/rstudio/cheatsheets/main/data-import.pdf)
+
+## Exploring Data
+
+Let's examine the structure of our NEHFS data:
+
+```{r}
+dim(nhefs)
+```
+
+There are `r nrow(nhefs)` observations, and `r ncol(nhefs)` columns in the nhefs tibble. 
+
+Let's select only specific columns from this tibble. We can do this using functions in the `dplyr` package, which is part of the `tidyvverse`:
+
+```{r}
+nhefs <- nhefs %>% select(seqn,qsmk,sex,age,income,sbp,dbp,price71,tax71,race,wt82_71)
+```
+
+We'll learn more about the `%>%` (pipe) operator later. We've just re-written the nhefs object to include only the `r ncol(nhefs)` variables in the `select()` function. 
+
+This is what the selected columns look like:
+
+```{r}
+head(nhefs)
+# can also use "tail" to see the end of the file
+# tail(nhefs)
+```
+
+## Functions and for loops
+
+Functions are pieces of code written to accomplish specific tasks. Suppose we wanted to evaluate the proportion of missing data in each column in `nhefs`. We could do this by writing a function:
+```{r}
+propMissing <- function(x){
+  mean(is.na(x))
+}
+propMissing(nhefs[,1])
+propMissing(nhefs[,2])
+```
+In the above code, `mean()` takes the sample average. In R, missing values are coded as `NA`, and `is.na()` is a base R function that returns a Boolean (true/false) value for each element in `x` that is missing. Thus, `mean(is.na(x))` returns the proportion of `x` that is missing.
+
+Instead of copying and pasting the function over and over, we can put it in a `for` loop:
+
+```{r}
+for (i in 1:ncol(nhefs)){
+  output <- propMissing(nhefs[,i])
+  print(output)
+}
+```
+
+Instead of a `for` loop, we can use the `apply` family of functions, which presents things in a way that is more informative. For example:
+```{r}
+apply(nhefs,2,propMissing)
+```
+More information on the apply family: [Apply tutorial](https://www.r-bloggers.com/r-tutorial-on-the-apply-family-of-functions/)
+
+We can also make the above much more presentable and easier to read:
+```{r}
+round(apply(nhefs,2,propMissing),3)*100
+```
+
+## R & RStudio: Diving Deeper
+
+Resources for further learning in R / Rstudio are endless:
+
+- [Chris Paciorek (UC Berkeley Bootcamp on youtube)](https://www.youtube.com/watch?v=CWrz8JJGKvI)
+
+- [R for Data Science (e-book)](http://r4ds.had.co.nz/) 
+
+- [swirl](http://swirlstats.com/)
+
+- [Udacity Data Analysis with R](https://www.udacity.com/course/data-analysis-with-r--ud651)
+
+- [Roger Peng's Coursera (advanced)](https://www.coursera.org/learn/r-programming#syllabus)
+
+- [r-bloggers](https://www.r-bloggers.com/)
+
+
+# References

@@ -1,0 +1,517 @@
+---
+title: "R Bootcamp"
+subtitle:
+author:
+date: "`r Sys.Date()`"
+session: 01
+output:
+  xaringan::moon_reader:
+    css: ["default", "assets/css/aml-theme.css", "assets/css/aml-fonts.css"]
+    seal: false 
+    lib_dir: libs
+    nature:
+      # autoplay: 5000
+      highlightStyle: solarized-light
+      highlightLanguage: R
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: "16:9"
+      beforeInit: "https://platform.twitter.com/widgets.js"
+    includes:
+      in_header: [assets/header.html]
+editor_options: 
+  chunk_output_type: console
+---
+
+class: title-slide, left, bottom
+
+<font size="50"> R Bootcamp </font> 
+
+<br><br><br><br><br><br>
+
+**Ashley I Naimi, PhD** <br> Associate Professor <br> Emory University <br>
+
+`r icons::fontawesome("envelope")` &nbsp; ashley.naimi@emory.edu <br> `r icons::fontawesome("twitter")` &nbsp; @ashley_naimi <br> `r icons::fontawesome("github")` &nbsp; ainaimi <br>
+
+
+```{r startup, include = FALSE, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(sandwich)
+library(lmtest)
+library(glue)
+library(knitr)
+
+remotes::install_github("hadley/emo")
+remotes::install_github("mitchelloharawild/icons")
+
+thm <- theme_classic() +
+  theme(
+    legend.position = "top",
+    legend.background = element_rect(fill = "transparent", colour = NA),
+    legend.key = element_rect(fill = "transparent", colour = NA)
+  )
+theme_set(thm)
+
+options(digits = 3, width = 110)
+
+hexes <- function(x) {
+  x <- rev(sort(x))
+  bad_svg <- c("dplyr", "tidyr")
+  x <- ifelse(x %in% bad_svg, paste0("./images/",x, ".png"), paste0("./images/",x, ".svg"))
+  markup <- function(pkg) glue::glue('<img src="images/{pkg}" class="title-hex">')
+  res <- purrr::map_chr(x, markup)
+  paste0(res, collapse = "")
+}
+```
+
+---
+
+# Acknowledgements
+
+Some of this material was taken from:
+
+- Chris Paciorek's [bootcamp](https://github.com/berkeley-scf/r-bootcamp-2016)
+- Garret Grolemund's [tidyverse, visualization, and manipulation basics](https://www.rstudio.com/resources/webinars/tidyverse-visualization-and-manipulation-basics/)
+- RStudio [Cheat Sheets](https://www.rstudio.com/resources/cheatsheets/)
+
+The NHEFS Data were taken from:
+- Miguel Hernán and Jamie Robins' [Causal Inference Book](https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/)
+
+A comprehensive list of additional resources: 
+
+- [R Studio Training](https://www.rstudio.com/online-learning/#r-programming)
+- [R Studio Webinars](https://www.rstudio.com/resources/webinars/) 
+- See also last slide of this presentation
+
+---
+
+# What is R? <img src="./images/Rlogo.png" style="float: right;width: 7%"/>
+
+Environment for statistical computing and graphics
+
+--
+
+Relatively simple **programming language**
+
+.pull-left[
+C is a compiled language
+- Requires a complete program to run
+- Fast
+]
+
+--
+
+.pull-right[
+R is an interpreted language
+- Commands run interactively
+- Flexible but slow
+]
+
+--
+
+If C is faster, why use R?
+
+- Over 10,000 Function Libraries
+- Implements many common statistical procedures
+- Exceptional graphics functions
+
+---
+# How does R compare to SAS/Stata? <img src="./images/Rlogo.png" style="float: right;width: 7%"/>
+
+- Fairly similar committment for simple tasks (e.g., regression, EDA).
+
+- Much better at plotting and visualizing data
+
+- Much easier to use for complex tasks (e.g., advanced estimation, complex data)
+
+- Overall, (much) greater ROI (IMO)
+
+- For certain tasks (e.g., machine learning), the repertoire of tools available to R users is **unparalleled**.
+
+---
+
+# R for Data Science <img src="./images/Rlogo.png" style="float: right;width: 7%"/>
+
+.center[  
+  <img src="./images/data-science.png" style="width: 80%"/>
+]
+
+
+---
+# Installing R <img src="./images/Rlogo.png" style="float: right;width: 7%"/>
+
+[www.r-project.org](https://www.r-project.org)
+
+<img src="./images/installR.jpg"/>
+
+---
+# Installing R <img src="./images/Rlogo.png" style="float: right;width: 7%"/>
+
+[http://lib.stat.cmu.edu/R/CRAN/](http://lib.stat.cmu.edu/R/CRAN/)
+
+<img src="./images/installR2.jpg"/>
+
+---
+# What is RStudio? <img src="./images/RStudio-Logo-Gray.png" style="float: right;width: 15%"/>
+
+.center[
+<img src="./images/rstudio-workbench.png" style="width: 60%"/>
+]
+
+---
+# What is RStudio? <img src="./images/RStudio-Logo-Gray.png" style="float: right;width: 15%"/>
+
+An integrated development environment (IDE) for R.
+
+Highlights syntax/code
+
+Code completion / indentation / navigation
+
+Package development / debugging
+
+Project management / organization
+
+Version control (git)
+
+Creates HTML, Word, and pdf documents
+
+A good option for reproducible research
+
+Some really great insights on data science tools: [INFO550](https://benkeser.github.io/info550/readings/)
+
+---
+
+# Installing RStudio <img src="./images/RStudio-Logo-Gray.png" style="float: right;width: 15%"/>
+
+[https://www.rstudio.com/products/rstudio/#Desktop](https://www.rstudio.com/products/rstudio/#Desktop)
+
+.center[
+<img src="./images/installRstudio.jpg" style="width: 50%"/>
+]
+
+---
+# Installing RStudio <img src="./images/RStudio-Logo-Gray.png" style="float: right;width: 15%"/>
+
+[https://www.rstudio.com/products/rstudio/download/#download](https://www.rstudio.com/products/rstudio/download/#download)
+
+.center[
+<img src="./images/installRstudio2.jpg" style="width: 50%"/>
+]
+
+---
+# Running Code in R
+
+To run a line of code in the R programming language, place your cursor at the end of a line, and press:
+
+- COMMAND + RETURN (Mac)
+- CTRL + ENTER (Windows)
+
+```{r}
+2*2*2
+```
+
+Alternatively, highlight a single or multiple lines with your cursor, and press the same keys
+
+
+---
+# R as a calculator
+
+Most basically, R is a very advanced calculator:
+
+```{r eval=T,warning=F,results='hide'}
+2 + 2 # add numbers
+2 * pi # multiply by a constant
+3^4 # powers
+runif(5) # random number generation
+sqrt(4^2) # functions
+log(10) # natural log (i.e., base e)
+log(100, base = 10) # log base 10
+23 %/% 2 # integer division
+23 %% 2 # modulus operator
+
+# scientific notation
+5000000000 * 1000
+5e9 * 1e3
+```
+
+More operators: [Quick-R](https://www.statmethods.net/management/operators.html)
+
+---
+
+# Assigning values to R objects 
+
+R is "object oriented". A basic task in R is to assign values to objects and perform functions on them:
+
+```{r}
+
+a <- 10
+a 
+a/100
+a+10
+
+# R is case sensitive!!!
+A <- 15
+print(c(a,A))
+```
+
+---
+
+# Vectors
+
+```{r}
+## Basic functional unit in R is a vector:
+# numeric vector
+nums <- c(1.1, 3, -5.7)
+nums
+
+nums <- rep(nums,2)
+nums
+
+# integer vector
+ints <- c(1L, 5L, -3L) # force storage as integer not decimal number
+# 'L' is for 'long integer' (historical)
+
+# sample nums with replacement
+new_nums <- sample(nums,8,replace = TRUE)
+new_nums
+
+```
+
+---
+# Vectors
+```{r}
+# logical (i.e., Boolean) vector
+bools <- c(TRUE, FALSE, TRUE, FALSE, T, T, F, F)
+bools
+# character vector
+chars <- c("epidemiology is", "the study", 
+           "of the", "distribution", 
+           "and determinants", "of disease", 
+           "in", "a population")
+chars
+```
+
+---
+# Data Frames
+Vectors can be combined into data frames (the basic data unit in R):
+```{r}
+A <- data.frame(new_nums,bools,chars)
+A
+```
+---
+
+# Lists
+And pretty much anything (vectors, data frames) can be combined into lists:
+```{r}
+basic_list <- list(rep(1:3,5),
+                   "what do you think of R so far?",
+                   A)
+basic_list[[1]]
+basic_list[[2]]
+head(basic_list[[3]])
+```
+---
+
+# Subsetting
+```{r}
+
+vals <- seq(2, 12, by = 2)
+vals
+
+vals[3]
+vals[3:5]
+vals[c(1, 3, 6)];vals[-c(1, 3, 6)]
+vals[c(rep(TRUE, 3), rep(FALSE, 2), TRUE)]
+
+```
+
+---
+
+# Subsetting Data Frames
+
+```{r error=T}
+A[3,];A[,3]
+A[2:3,];A[,2:3]
+subset(A,bools==F,select = -bools)
+```
+---
+
+# (Base) R Functions: Getting Help
+
+```{r}
+# HELP!
+?median
+
+help.search('linear regression')
+
+help(package='ggplot2')
+
+```
+---
+
+# (Base) R Functions: Object Structure
+
+`iris` is a flower dataset included with R. The `str()` command gives the structure of the iris dataset:
+```{r}
+str(iris)
+```
+
+The `class()` command tells us what kind of object this is:
+```{r}
+class(iris)
+```
+---
+
+# Using R & RStudio <img src="./images/RStudio-Logo-Gray.png" style="float: right;width: 25%"/>
+
+R remains cutting edge through a network of users/maintainers who contribute **packages**. 
+Packages are functions that are not part of base R.
+Without these packages, R would be much less useful.
+
+For example:
+
+ - `VIM` is a package for the VIsualisation of Missing data
+
+ - `boot` is a package to get bootstrap CIs and standard errors
+ 
+ - `splines` is a package for including flexible regression splines in linear models
+ 
+ - `data.table` is a package for fast manipulation of data frames
+
+ - The `tidyverse` is a collection of packages that facilitate the practice of "tidy" data science.
+---
+
+# Installing and loading packages <img src="./images/tidyverse.png" style="float: right;width: 7%"/>
+
+Let's install the tidyverse, and some other packages that are important for basic data visualization. 
+
+If this is your first time installing packages in R, you'll have to choose a CRAN mirror. This is done with the "repos = " (repository) argument (but can be done other ways too).
+
+```{r,warning=F,message=F}
+install.packages("tidyverse",repos='http://lib.stat.cmu.edu/R/CRAN')
+library(tidyverse)
+```
+
+You should get a warning and other messages that I excluded here.
+
+---
+# Installing and loading packages
+
+Let's also install and load a package for the VIsualisation of Missing data:
+
+```{r,warning=F,message=F}
+ install.packages("VIM",repos='http://lib.stat.cmu.edu/R/CRAN')
+ library(VIM)
+```
+
+---
+
+# Importing data into R <img src="./images/readr.png" style="float: right;width: 7%"/>
+
+We can now use functions from the `tidyverse` to load our NHEFS data:
+
+```{r}
+nhefs <- read_csv("./data/nhefs.csv")
+```
+
+---
+
+# Importing data into R <img src="./images/readr.png" style="float: right;width: 7%"/>
+
+Using the `tidyverse` package to import data (as opposed to base R options) creates a tibble, which is an augmented data frame.
+
+```{r}
+class(nhefs)
+```
+
+More options for importing data: [R Studio Data Import Cheat Sheet](https://github.com/rstudio/cheatsheets/raw/master/data-import.pdf)
+
+---
+# Exploring Data
+
+Let's examine the structure of our NEHFS data:
+
+```{r}
+dim(nhefs)
+```
+
+There are `r nrow(nhefs)` observations, and `r ncol(nhefs)` columns in the nhefs tibble. 
+
+--
+
+Let's select only specific columns from this tibble. We can do this using functions in the `dplyr` package, which is part of the `tidyvverse`:
+
+```{r}
+nhefs <- nhefs %>% select(seqn,qsmk,sbp,dbp,sex,age,race,income,marital,school)
+```
+
+We'll learn more about the `%>%` (pipe) operator later. We've just re-written the nhefs object to include only the 10 variables in the `select()` function. 
+
+
+---
+# Exploring Data
+
+This is what the selected columns look like:
+
+```{r}
+head(nhefs)
+# can also use "tail" to see the end of the file
+# tail(nhefs)
+```
+
+---
+
+# Functions and for loops
+
+Functions are pieces of code written to accomplish specific tasks. Suppose we wanted to evaluate the proportion of missing data in each column in `nhefs`. We could do this by writing a function:
+```{r}
+propMissing <- function(x){
+  mean(is.na(x))
+}
+propMissing(nhefs[,1])
+propMissing(nhefs[,2])
+```
+In the above code, `mean()` takes the sample average. In R, missing values are coded as `NA`, and `is.na()` is a base R function that returns a Boolean (true/false) value for each element in `x` that is missing. Thus, `mean(is.na(x))` returns the proportion of `x` that is missing.
+---
+
+# Functions and for loops
+
+Instead of copying and pasting the function over and over, we can put it in a `for` loop:
+
+```{r}
+for (i in 1:10){
+  output <- propMissing(nhefs[,i])
+  print(output)
+}
+```
+---
+
+# Functions and for loops
+
+Instead of a `for` loop, we can use the `apply` family of functions, which presents things in a way that is more informative. For example:
+```{r}
+apply(nhefs,2,propMissing)
+```
+More information on the apply family: [Apply tutorial](https://www.r-bloggers.com/r-tutorial-on-the-apply-family-of-functions/)
+
+We can also make the above much more presentable and easier to read:
+```{r}
+round(apply(nhefs,2,propMissing),3)*100
+```
+---
+
+# R & RStudio: Diving Deeper <img src="./images/RStudio-Logo-Gray.png" style="float: right;width: 25%"/>
+
+Resources for further learning in R / Rstudio are endless:
+
+- [Chris Paciorek (UC Berkeley Bootcamp on youtube)](https://www.youtube.com/watch?v=CWrz8JJGKvI)
+
+- [R for Data Science (e-book)](http://r4ds.had.co.nz/) 
+
+- [swirl](http://swirlstats.com/)
+
+- [Udacity Data Analysis with R](https://www.udacity.com/course/data-analysis-with-r--ud651)
+
+- [Roger Peng's Coursera (advanced)](https://www.coursera.org/learn/r-programming#syllabus)
+
+- [r-bloggers](https://www.r-bloggers.com/)
